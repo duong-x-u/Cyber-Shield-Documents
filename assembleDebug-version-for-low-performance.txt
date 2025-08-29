@@ -1,0 +1,15 @@
+   ./gradlew clean
+   ./gradlew :nodejs-mobile-react-native:assembleDebug --no-daemon --max-workers 1
+   ./gradlew :notifee_react-native:assembleDebug --no-daemon --max-workers 1
+   ./gradlew :react-native-push-notification:assembleDebug --no-daemon --max-workers 1
+   ./gradlew :react-native-keychain:assembleDebug --no-daemon --max-workers 1
+   ./gradlew :react-native-vector-icons:assembleDebug --no-daemon --max-workers 1
+   ./gradlew :react-native-screens:assembleDebug --no-daemon --max-workers 1
+   ./gradlew :react-native-safe-area-context:assembleDebug --no-daemon --max-workers 1
+   ./gradlew :react-native-clipboard_clipboard:assembleDebug --no-daemon --max-workers 1
+   ./gradlew :react-native-permissions:assembleDebug --no-daemon --max-workers 1
+   ./gradlew assembleDebug --no-daemon --max-workers 1
+
+
+./gradlew clean
+./gradlew assembleDebug --no-daemon --max-workers 1

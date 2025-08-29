@@ -1,10 +1,18 @@
+# Build artifacts and generated files
+# ===================================
+/android/app/build
+/android/build
+/ios/build
+*.apk
+*.aab
+*.jsbundle.meta
+
 # OSX
 #
 .DS_Store
 
 # Xcode
 #
-build/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -24,7 +32,6 @@ DerivedData
 
 # Android/IntelliJ
 #
-build/
 .idea
 .gradle
 local.properties
@@ -72,3 +79,18 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Project-specific ignores
+# =========================
+
+# Backup folders
+/android_backup/
+
+# Log files
+*.log
+
+# User-specific editor files
+.vscode/
+
+# Explicitly ignore the release keystore for security
+/android/app/my-release-key.keystore

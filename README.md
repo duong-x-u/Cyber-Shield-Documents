@@ -1,79 +1,38 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# CyberShield
 
-# Getting Started
+> CyberShield: Ứng dụng Android (React Native) giúp phát hiện tin nhắn lừa đảo bằng AI, bảo vệ người dùng khỏi các mối nguy trên mạng.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Về dự án
 
-## Step 1: Start the Metro Server
+CyberShield là một công cụ bảo mật cho người dùng Android, được thiết kế để chủ động phát hiện và cảnh báo về các tin nhắn có nội dung lừa đảo. Ứng dụng có khả năng quét các tin nhắn đến từ nhiều nguồn khác nhau và phân tích chúng trong nền để đưa ra cảnh báo kịp thời.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## Tính năng chính
 
-To start Metro, run the following command from the _root_ of your React Native project:
+- **Phân tích tự động:** Tự động quét và phân tích tin nhắn đến từ các ứng dụng phổ biến (Zalo, Messenger, SMS...) và từ clipboard.
+- **Phân tích thủ công:** Cho phép người dùng nhập trực tiếp văn bản đáng ngờ để kiểm tra.
+- **Tích hợp menu ngữ cảnh:** Phân tích nhanh bất kỳ đoạn văn bản nào bằng cách bôi đen và chọn "Phân tích với CyberShield".
+- **Chế độ chơi game:** Tự động tạm dừng các tác vụ quét nền khi người dùng đang chơi game để đảm bảo hiệu năng.
+- **Cảnh báo tức thì:** Gửi thông báo hệ thống ngay lập-tức khi phát hiện nội dung có dấu hiệu nguy hiểm.
 
-```bash
-# using npm
-npm start
+## Công nghệ sử dụng
 
-# OR using Yarn
-yarn start
-```
+- **Frontend:** React Native
+- **Native Modules (Android):** Kotlin
+- **Backend:** Python (Flask/FastAPI)
 
-## Step 2: Start your Application
+## Bắt đầu
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+Để chạy dự án, hãy đảm bảo bạn đã cài đặt môi trường cho React Native.
 
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+1.  **Cài đặt các gói phụ thuộc:**
+    ```bash
+    npm install
+    ```
+2.  **Khởi động Metro Bundler:**
+    ```bash
+    npm start
+    ```
+3.  **Chạy ứng dụng trên Android:**
+    ```bash
+    npm run android
+    ```
