@@ -19,7 +19,16 @@ class NotificationListener : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
-        if (sbn == null) return
+        if (sbn == null) {
+            Log.d(TAG, "onNotificationPosted: sbn is null, returning.")
+            return
+        }
+
+        val notificationCategory = sbn.notification.category
+        if (notificationCategory == Notification.CATEGORY_SYSTEM || notificationCategory == Notification.CATEGORY_SERVICE) {
+            Log.d(TAG, "Skipping system/service notification from ${sbn.packageName}, category: $notificationCategory")
+            return
+        }
 
         // In gaming mode, all automatic scans are paused.
         if (RefactoredControlService.isGamingModeActive) {
@@ -47,6 +56,7 @@ class NotificationListener : NotificationListenerService() {
 
         // Ignore notifications from self or non-target apps.
         if (!isTargetApp || packageName == applicationContext.packageName) {
+            Log.d(TAG, "Notification from non-target app or self: $packageName, returning.")
             return
         }
 

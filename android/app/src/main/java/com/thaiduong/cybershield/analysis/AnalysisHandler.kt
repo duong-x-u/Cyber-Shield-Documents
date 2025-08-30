@@ -135,6 +135,7 @@ object AnalysisHandler {
             .build()
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        Log.d(TAG, "Notification issued with title: $title and body: $body")
     }
 
     private fun createNotificationChannel(manager: NotificationManager) {
