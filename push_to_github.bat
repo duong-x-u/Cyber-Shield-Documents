@@ -26,7 +26,7 @@ if not defined commit_message (
 )
 
 echo Committing files with message: "%commit_message%"
-git commit -m "%commit_message%"
+call git commit -m "%commit_message%"
 echo.
 
 echo Pushing changes to GitHub...
