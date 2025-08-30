@@ -53,16 +53,20 @@ object AnalysisHandler {
         // Debounce: if the same text was analyzed recently, skip.
         val currentTime = System.currentTimeMillis()
         if (text == lastAnalyzedText && (currentTime - lastAnalysisTime) < DEBOUNCE_INTERVAL) {
+            Log.d(TAG, "Skipping analysis for recently analyzed text.")
             return
         }
 
         // Skip analysis if gaming mode is active
         if (RefactoredControlService.isGamingModeActive) {
+            Log.d(TAG, "Gaming mode is active, skipping analysis.")
             return
         }
 
         lastAnalyzedText = text
         lastAnalysisTime = currentTime
+
+        Log.d(TAG, "Starting analysis for text: $text")
 
         val urls = extractUrls(text)
         val requestData = AnalysisRequest(text, urls)
@@ -85,9 +89,11 @@ object AnalysisHandler {
                 }
 
                 response.body?.string()?.let { responseBody ->
+                    Log.d(TAG, "Raw API Response: $responseBody")
                     try {
                         val fullResponse = gson.fromJson(responseBody, FullApiResponse::class.java)
                         val result = fullResponse.result
+                        Log.d(TAG, "Parsed is_scam: ${result.is_scam}")
                         showAnalysisNotification(context, result)
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to parse API response", e)
@@ -129,6 +135,7 @@ object AnalysisHandler {
             .build()
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        Log.d(TAG, "Notification issued with title: $title and body: $body")
     }
 
     private fun createNotificationChannel(manager: NotificationManager) {

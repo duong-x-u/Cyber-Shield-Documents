@@ -20,16 +20,19 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         if (sbn == null) {
+            Log.d(TAG, "onNotificationPosted: sbn is null, returning.")
             return
         }
 
         val notificationCategory = sbn.notification.category
         if (notificationCategory == Notification.CATEGORY_SYSTEM || notificationCategory == Notification.CATEGORY_SERVICE) {
+            Log.d(TAG, "Skipping system/service notification from ${sbn.packageName}, category: $notificationCategory")
             return
         }
 
         // In gaming mode, all automatic scans are paused.
         if (RefactoredControlService.isGamingModeActive) {
+            Log.d(TAG, "Gaming mode is active, skipping notification analysis.")
             return
         }
 
@@ -39,6 +42,7 @@ class NotificationListener : NotificationListenerService() {
         // Throttle notifications from the same app to avoid spam.
         val lastCheck = lastCheckMap[packageName] ?: 0
         if (currentTime - lastCheck < THROTTLE_INTERVAL) {
+            Log.d(TAG, "Notification from $packageName throttled, skipping.")
             return
         }
         lastCheckMap[packageName] = currentTime
@@ -52,6 +56,7 @@ class NotificationListener : NotificationListenerService() {
 
         // Ignore notifications from self or non-target apps.
         if (!isTargetApp || packageName == applicationContext.packageName) {
+            Log.d(TAG, "Notification from non-target app or self: $packageName, returning.")
             return
         }
 
@@ -77,10 +82,13 @@ class NotificationListener : NotificationListenerService() {
 
 
         if (text.isNullOrEmpty() || text.isBlank()) {
+            Log.d(TAG, "Notification from $packageName has no usable text, skipping.")
             return
         }
 
         
+
+        Log.d(TAG, "Captured text from [$packageName] ($title) -> Forwarding to AnalysisHandler")
 
         // Instead of sending an event to JS, directly call the centralized AnalysisHandler.
         AnalysisHandler.analyzeText(applicationContext, text)
