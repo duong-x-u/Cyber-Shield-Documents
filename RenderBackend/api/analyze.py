@@ -102,22 +102,19 @@ async def check_urls_safety(urls: list):
 
 async def perform_full_analysis(text, urls):
     cache_key = f"analysis:{hashlib.sha256(text.encode()).hexdigest()}"
-    # if redis_client:
-    #     try:
-    #         cached_result = redis_client.get(cache_key)
-    #         if cached_result:
-    #             print(f"Cache hit cho key: {cache_key}")
-    #             return json.loads(cached_result)
-    #     except redis.exceptions.RedisError as e:
-    #         print(f"Lỗi truy cập Redis: {e}")
+    if redis_client:
+        try:
+            cached_result = redis_client.get(cache_key)
+            if cached_result:
+                print(f"Cache hit cho key: {cache_key}")
+                return json.loads(cached_result)
+        except redis.exceptions.RedisError as e:
+            print(f"Lỗi truy cập Redis: {e}")
 
     # Chạy song song cả hai tác vụ
     gemini_task = analyze_with_gemini(text)
     urls_task = check_urls_safety(urls)
     gemini_result, url_matches = await asyncio.gather(gemini_task, urls_task)
-
-    print(f"DEBUG: Gemini Result: {gemini_result}")
-    print(f"DEBUG: URL Matches: {url_matches}")
 
     if not gemini_result:
         return {'error': 'Phân tích với Gemini thất bại', 'status_code': 500}
@@ -132,13 +129,12 @@ async def perform_full_analysis(text, urls):
         # Tăng điểm nguy hiểm nếu có URL độc hại
         final_result['score'] = max(final_result['score'], 4)
 
-    # if redis_client:
-    #     try:
-    #         redis_client.setex(cache_key, 86400, json.dumps(final_result))
-    #     except redis.exceptions.RedisError as e:
-    #         print(f"Lỗi lưu vào Redis: {e}")
+    if redis_client:
+        try:
+            redis_client.setex(cache_key, 86400, json.dumps(final_result))
+        except redis.exceptions.RedisError as e:
+            print(f"Lỗi lưu vào Redis: {e}")
 
-    print(f"DEBUG: Final Result: {final_result}")
     return final_result
 
 @analyze_endpoint.route('/analyze', methods=['POST'])
