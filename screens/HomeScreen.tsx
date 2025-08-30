@@ -80,12 +80,11 @@ export default function HomeScreen() {
         const timeoutId = setTimeout(() => controller.abort(), ANALYSIS_TIMEOUT);
 
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: text, urls: urls }),
-                signal: controller.signal,
-            });
+                  const response = await fetch('https://cybershield-backend-renderserver.onrender.com/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
 
             clearTimeout(timeoutId);
 

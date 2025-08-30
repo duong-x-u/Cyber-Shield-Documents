@@ -64,26 +64,6 @@ android {
     }
 }
 
-// ----------------- TASK AUTO BUNDLE JS -----------------
-task bundleReleaseJs(type: Exec) {
-    // tạo folder assets + res nếu chưa có
-    doFirst {
-        def assetsDir = file('app/src/main/assets')
-        def resDir = file('app/src/main/res')
-        if (!assetsDir.exists()) assetsDir.mkdirs()
-        if (!resDir.exists()) resDir.mkdirs()
-    }
-
-    def command = Os.isFamily(Os.FAMILY_WINDOWS) ? 'cmd' : 'sh'
-    def argsList = Os.isFamily(Os.FAMILY_WINDOWS) ?
-            ['/c', 'npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output app/src/main/assets/index.android.bundle --assets-dest app/src/main/res/'] :
-            ['-c', 'npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output app/src/main/assets/index.android.bundle --assets-dest app/src/main/res/']
-
-    commandLine ([command] + argsList)
-}
-
-// Auto chạy trước build release
-preBuild.dependsOn(bundleReleaseJs)
 
 // ----------------- DEPENDENCIES -----------------
 dependencies {

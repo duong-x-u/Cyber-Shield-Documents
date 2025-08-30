@@ -39,16 +39,26 @@ if not SAFE_BROWSING_API_KEY:
 
 # --- Logic Phân tích ---
 
-UNIFIED_PROMPT = lambda text: f'''
-Bạn là một hệ thống phân tích an toàn thông minh. Hãy phân tích đoạn tin nhắn sau và trả lời dưới dạng JSON với các key:
+UNIFIED_PROMPT = lambda text: f"""
+Bạn là một hệ thống phân tích an toàn thông minh, chuyên phát hiện mọi hành vi có nguy cơ lừa đảo, đe dọa, quấy rối, kích động bạo lực hoặc chống phá Nhà nước Việt Nam, gây tổn hại đến người nhận hoặc xã hội.
+
+Nếu tin nhắn có bất kỳ dấu hiệu sau, dù không trực tiếp lừa đảo tài chính, hãy đánh dấu "is_scam": true để bảo vệ toàn diện:
+- Ngôn từ thô tục, xúc phạm cá nhân hoặc nhóm người
+- Đe dọa, ép buộc, khủng bố tinh thần
+- Kích động bạo lực, nổi loạn, chống phá chính quyền
+- Phát tán thông tin sai lệch gây hoang mang
+- Gây ảnh hưởng tiêu cực đến an ninh trật tự xã hội
+
+Trả lời dưới dạng JSON với các key:
 - "is_scam" (boolean)
 - "reason" (string)
 - "types" (string)
-- "score" (number 1-5)
+- "score" (number 0-5)  # 0 là không nguy hiểm, 5 là rất nguy hiểm
 - "recommend" (string)
 
 Đoạn tin nhắn: {text}
-'''
+"""
+
 
 async def analyze_with_gemini(text):
     # ... (Nội dung hàm này không đổi)
@@ -92,19 +102,22 @@ async def check_urls_safety(urls: list):
 
 async def perform_full_analysis(text, urls):
     cache_key = f"analysis:{hashlib.sha256(text.encode()).hexdigest()}"
-    if redis_client:
-        try:
-            cached_result = redis_client.get(cache_key)
-            if cached_result:
-                print(f"Cache hit cho key: {cache_key}")
-                return json.loads(cached_result)
-        except redis.exceptions.RedisError as e:
-            print(f"Lỗi truy cập Redis: {e}")
+    # if redis_client:
+    #     try:
+    #         cached_result = redis_client.get(cache_key)
+    #         if cached_result:
+    #             print(f"Cache hit cho key: {cache_key}")
+    #             return json.loads(cached_result)
+    #     except redis.exceptions.RedisError as e:
+    #         print(f"Lỗi truy cập Redis: {e}")
 
     # Chạy song song cả hai tác vụ
     gemini_task = analyze_with_gemini(text)
     urls_task = check_urls_safety(urls)
     gemini_result, url_matches = await asyncio.gather(gemini_task, urls_task)
+
+    print(f"DEBUG: Gemini Result: {gemini_result}")
+    print(f"DEBUG: URL Matches: {url_matches}")
 
     if not gemini_result:
         return {'error': 'Phân tích với Gemini thất bại', 'status_code': 500}
@@ -119,12 +132,13 @@ async def perform_full_analysis(text, urls):
         # Tăng điểm nguy hiểm nếu có URL độc hại
         final_result['score'] = max(final_result['score'], 4)
 
-    if redis_client:
-        try:
-            redis_client.setex(cache_key, 86400, json.dumps(final_result))
-        except redis.exceptions.RedisError as e:
-            print(f"Lỗi lưu vào Redis: {e}")
+    # if redis_client:
+    #     try:
+    #         redis_client.setex(cache_key, 86400, json.dumps(final_result))
+    #     except redis.exceptions.RedisError as e:
+    #         print(f"Lỗi lưu vào Redis: {e}")
 
+    print(f"DEBUG: Final Result: {final_result}")
     return final_result
 
 @analyze_endpoint.route('/analyze', methods=['POST'])

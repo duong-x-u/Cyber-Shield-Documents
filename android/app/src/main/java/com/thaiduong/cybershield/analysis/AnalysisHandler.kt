@@ -25,6 +25,10 @@ data class AnalysisResponse(
     val original_text: String?
 )
 
+data class FullApiResponse(
+    val result: AnalysisResponse
+)
+
 object AnalysisHandler {
     private const val TAG = "AnalysisHandler"
     private const val ANALYSIS_API_URL = "https://cybershield-backend-renderserver.onrender.com/api/analyze"
@@ -85,8 +89,11 @@ object AnalysisHandler {
                 }
 
                 response.body?.string()?.let { responseBody ->
+                    Log.d(TAG, "Raw API Response: $responseBody")
                     try {
-                        val result = gson.fromJson(responseBody, AnalysisResponse::class.java)
+                        val fullResponse = gson.fromJson(responseBody, FullApiResponse::class.java)
+                        val result = fullResponse.result
+                        Log.d(TAG, "Parsed is_scam: ${result.is_scam}")
                         showAnalysisNotification(context, result)
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to parse API response", e)
