@@ -15,6 +15,7 @@
     "@google/gemini-cli": "^0.1.22",
     "@notifee/react-native": "^9.1.8",
     "@react-native-clipboard/clipboard": "^1.14.3",
+    "@react-native-community/clipboard": "^1.5.1",
     "@react-native/gradle-plugin": "^0.81.0",
     "@react-navigation/native": "~6.1.6",
     "@react-navigation/stack": "~6.3.17",
