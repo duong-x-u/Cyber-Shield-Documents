@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, Button, Alert, NativeModules, DeviceEventEmitter, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Switch, Button, Alert, NativeModules, DeviceEventEmitter, ScrollView, TouchableOpacity } from 'react-native';
 import InputBox from '../components/InputBox';
 import ResultCard from '../components/ResultCard';
 import LoadingOverlay from '../components/LoadingOverlay';
+import Clipboard from '@react-native-community/clipboard';
+import { Animated } from 'react-native';
 
 const { ControlModule } = NativeModules;
 const API_URL = 'https://cybershield-backend-renderserver.onrender.com/api/analyze';
@@ -48,6 +50,9 @@ export default function HomeScreen() {
     const [error, setError] = useState<string | null>(null);
     const [isProtectionEnabled, setIsProtectionEnabled] = useState(false);
 
+    // For ResultCard animation
+    const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+
     useEffect(() => {
         const processTextSubscription = DeviceEventEmitter.addListener('onProcessText', async (event) => {
             const text = event.text;
@@ -62,6 +67,22 @@ export default function HomeScreen() {
             processTextSubscription.remove();
         };
     }, []);
+
+    // Animation for ResultCard
+    useEffect(() => {
+        if (analysisResult) {
+            Animated.timing(
+                fadeAnim,
+                {
+                    toValue: 1,
+                    duration: 500,
+                    useNativeDriver: true,
+                }
+            ).start();
+        } else {
+            fadeAnim.setValue(0);
+        }
+    }, [analysisResult, fadeAnim]);
 
     const handleAnalysis = async (text: string, isAuto: boolean = false) => {
         if (!text.trim()) {
@@ -80,12 +101,7 @@ export default function HomeScreen() {
         const timeoutId = setTimeout(() => controller.abort(), ANALYSIS_TIMEOUT);
 
         try {
-            const urls = text.match(URL_REGEX) || [];
-
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), ANALYSIS_TIMEOUT);
-
-            const response = await fetch('https://cybershield-backend-renderserver.onrender.com/api/analyze', {
+            const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -104,7 +120,6 @@ export default function HomeScreen() {
             const result = await response.json();
             setAnalysisResult(result.result);
 
-            // For text from context menu, also show a notification
             if (isAuto) {
                 ControlModule.showAnalysisNotification(result.result);
             }
@@ -121,6 +136,22 @@ export default function HomeScreen() {
             }
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleClear = () => {
+        setInputText('');
+        setAnalysisResult(null);
+        setError(null);
+    };
+
+    const handlePaste = async () => {
+        const clipboardContent = await Clipboard.getString();
+        if (clipboardContent) {
+            setInputText(clipboardContent);
+            Alert.alert("Dán thành công", "Nội dung từ clipboard đã được dán vào ô nhập liệu.");
+        } else {
+            Alert.alert("Lỗi", "Clipboard rỗng hoặc không có nội dung văn bản.");
         }
     };
 
@@ -174,11 +205,23 @@ export default function HomeScreen() {
             </Text>
             <InputBox value={inputText} onChange={setInputText} />
             <View style={styles.buttonContainer}>
-                 <Button title="KIỂM TRA" onPress={() => handleAnalysis(inputText)} disabled={isLoading} />
+                <TouchableOpacity style={[styles.actionButton, isLoading && styles.actionButtonDisabled]} onPress={() => handleAnalysis(inputText)} disabled={isLoading}>
+                    <Text style={styles.actionButtonText}>KIỂM TRA</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.actionButton, isLoading && styles.actionButtonDisabled]} onPress={handlePaste} disabled={isLoading}>
+                    <Text style={styles.actionButtonText}>DÁN TỪ CLIPBOARD</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.actionButton, styles.clearActionButton, isLoading && styles.actionButtonDisabled]} onPress={handleClear} disabled={isLoading}>
+                    <Text style={styles.actionButtonText}>XÓA NỘI DUNG</Text>
+                </TouchableOpacity>
             </View>
             
             {error && <Text style={styles.errorText}>{error}</Text>}
-            <ResultCard result={analysisResult} />
+            {analysisResult && (
+                <Animated.View style={{ opacity: fadeAnim }}>
+                    <ResultCard result={analysisResult} />
+                </Animated.View>
+            )}
 
             <View style={styles.card}>
                 <Text style={styles.cardTitle}>Bảo Vệ Tự Động</Text>
@@ -186,7 +229,7 @@ export default function HomeScreen() {
                     Tự động quét tin nhắn từ Zalo, Messenger... và cảnh báo nếu có nguy hiểm.
                 </Text>
                 <View style={styles.switchContainer}>
-                    <Text style={[styles.status, { color: isProtectionEnabled ? '#4CAF50' : '#F44336' }]}>
+                    <Text style={[styles.status, { color: isProtectionEnabled ? '#66BB6A' : '#EF5350' }]}>
                         {isProtectionEnabled ? 'ĐANG BẬT' : 'ĐANG TẮT'}
                     </Text>
                     <Switch
@@ -196,12 +239,16 @@ export default function HomeScreen() {
                         value={isProtectionEnabled}
                     />
                 </View>
-                 <Text style={styles.permissionDescription}>
+                <Text style={styles.permissionDescription}>
                     Nếu tính năng không hoạt động, hãy cấp đủ quyền cho ứng dụng:
                 </Text>
                 <View style={styles.permissionButtonContainer}>
-                    <Button title="Quyền Thông Báo" onPress={() => openAppSettings('notification')} />
-                    <Button title="Quyền Sử Dụng" onPress={() => openAppSettings('usage')} />
+                    <TouchableOpacity style={styles.permissionActionButton} onPress={() => openAppSettings('notification')}>
+                        <Text style={styles.permissionActionButtonText}>Quyền Thông Báo</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.permissionActionButton} onPress={() => openAppSettings('usage')}>
+                        <Text style={styles.permissionActionButtonText}>Quyền Sử Dụng</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </ScrollView>
@@ -212,14 +259,14 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: '#f0f2f5',
+        backgroundColor: '#F0F8FF',
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 8,
-        color: '#1c1e21',
+        color: '#333333',
     },
     description: {
         fontSize: 16,
@@ -230,14 +277,39 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         marginVertical: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        flexWrap: 'wrap',
+    },
+    actionButton: {
+        backgroundColor: '#A7D9F0',
+        paddingVertical: 12,
+        paddingHorizontal: 15,
+        borderRadius: 12,
+        flex: 1,
+        margin: 5,
+        alignItems: 'center',
+        minWidth: 120,
+    },
+    actionButtonText: {
+        color: '#333333',
+        fontSize: 15,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    clearActionButton: {
+        backgroundColor: '#D8BFD8',
+    },
+    actionButtonDisabled: {
+        opacity: 0.6,
     },
     errorText: {
-        color: 'red',
+        color: '#D32F2F',
         textAlign: 'center',
         marginVertical: 10,
     },
     card: {
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         padding: 20,
         marginTop: 20,
@@ -251,7 +323,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 8,
-        color: '#1c1e21',
+        color: '#333333',
     },
     cardDescription: {
         fontSize: 15,
@@ -278,9 +350,36 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    statusGranted: {
+        color: '#66BB6A',
+    },
+    statusDenied: {
+        color: '#EF5350',
+    },
+    serviceButtonActive: {
+        backgroundColor: '#66BB6A',
+    },
+    serviceButtonInactive: {
+        backgroundColor: '#EF5350',
+    },
     permissionButtonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         marginTop: 10,
+    },
+    permissionActionButton: {
+        backgroundColor: '#B2EBF2',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 12,
+        flex: 1,
+        marginHorizontal: 5,
+        alignItems: 'center',
+    },
+    permissionActionButtonText: {
+        color: '#333333',
+        fontSize: 14,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
