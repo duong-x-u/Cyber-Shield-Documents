@@ -30,19 +30,13 @@ It works by analyzing notification text from apps like Messenger, Zalo, or SMS.
 
 ---
 
-### 5. Custom Keywords
-- In **Settings**, you can add suspicious keywords (e.g. "chuyển tiền", "hack link").  
-- If these appear in a notification, CyberShield will trigger an alert immediately.  
-
----
-
-### 6. Privacy
+### 5. Privacy
 - CyberShield **does not store or keep history of your messages**.  
 - All analysis is done in real-time, and sensitive content stays on your device.  
 
 ---
 
-### 7. Notes
+### 6. Notes
 - CyberShield is a **support tool only**. Users should still be cautious when handling suspicious messages.  
 - The app does not guarantee 100% accuracy.  
 
@@ -57,7 +51,7 @@ CyberShield là một ứng dụng **phi lợi nhuận**, giúp người dùng p
 ---
 
 ### 2. Cài đặt
-1. Tải và cài CyberShield từ nguồn chính thức (Google Play / GitHub).  
+1. Tải và cài CyberShield từ nguồn chính thức (Google Play / GitHub / Google Drive).  
 2. Mở ứng dụng lần đầu.  
 
 ---
@@ -76,18 +70,12 @@ CyberShield là một ứng dụng **phi lợi nhuận**, giúp người dùng p
 
 ---
 
-### 5. Từ khóa tùy chỉnh
-- Trong phần **Cài đặt**, người dùng có thể thêm các từ khóa nghi ngờ (vd: "chuyển tiền", "hack link").  
-- Nếu thông báo chứa từ khóa này, CyberShield sẽ cảnh báo ngay lập tức.  
-
----
-
-### 6. Bảo mật
+### 5. Bảo mật
 - CyberShield **không lưu trữ hay giữ lịch sử tin nhắn của bạn**.  
 - Tất cả xử lý đều diễn ra theo thời gian thực, dữ liệu nhạy cảm nằm hoàn toàn trên thiết bị.  
 
 ---
 
-### 7. Lưu ý
+### 6. Lưu ý
 - CyberShield chỉ là **công cụ hỗ trợ**, người dùng vẫn cần cẩn trọng khi xử lý tin nhắn khả nghi.  
 - Ứng dụng không đảm bảo độ chính xác tuyệt đối.  
